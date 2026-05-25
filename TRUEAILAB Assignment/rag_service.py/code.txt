@@ -1,0 +1,44 @@
+import json
+
+from app.services.embedding_service import generate_embedding
+from app.vectorstore.faiss_store import add_vector, search_vector
+from app.utils.chunking import chunk_text
+
+SIMILARITY_THRESHOLD = 0.75
+
+def index_documents():
+    with open("docs.json", "r") as file:
+        docs = json.load(file)
+
+    for doc in docs:
+        chunks = chunk_text(doc["content"])
+
+        for idx, chunk in enumerate(chunks):
+            embedding = generate_embedding(chunk)
+
+            metadata = {
+                "title": doc["title"],
+                "chunk_id": idx,
+                "content": chunk
+            }
+
+            add_vector(embedding, metadata)
+
+def retrieve_context(query):
+    query_embedding = generate_embedding(query)
+
+    results = search_vector(query_embedding)
+
+    filtered = [
+        r for r in results
+        if r["score"] >= SIMILARITY_THRESHOLD
+    ]
+
+    if not filtered:
+        return None, []
+
+    context = "\n".join(
+        [r["metadata"]["content"] for r in filtered]
+    )
+
+    return context, filtered
