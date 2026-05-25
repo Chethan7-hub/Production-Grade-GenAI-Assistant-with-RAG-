@@ -1,0 +1,24 @@
+memory_store = {}
+
+def add_message(session_id, user_msg, bot_msg):
+    if session_id not in memory_store:
+        memory_store[session_id] = []
+
+    memory_store[session_id].append({
+        "user": user_msg,
+        "assistant": bot_msg
+    })
+
+    memory_store[session_id] = memory_store[session_id][-5:]
+
+def get_history(session_id):
+    if session_id not in memory_store:
+        return ""
+
+    history = ""
+
+    for msg in memory_store[session_id]:
+        history += f"User: {msg['user']}\n"
+        history += f"Assistant: {msg['assistant']}\n"
+
+    return history
