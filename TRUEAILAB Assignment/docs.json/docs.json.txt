@@ -1,0 +1,22 @@
+[
+  {
+    "title": "Reset Password",
+    "content": "Users can reset their password from Settings > Security."
+  },
+  {
+    "title": "Refund Policy",
+    "content": "Refunds are processed within 5 to 7 business days."
+  },
+  {
+    "title": "Shipping",
+    "content": "Orders are shipped within 24 hours after confirmation."
+  },
+  {
+    "title": "Account Deletion",
+    "content": "Users can permanently delete accounts from profile settings."
+  },
+  {
+    "title": "Subscription",
+    "content": "Monthly and yearly subscription plans are available."
+  }
+]
