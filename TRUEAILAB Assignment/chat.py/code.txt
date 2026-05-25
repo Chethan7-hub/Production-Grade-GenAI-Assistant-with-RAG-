@@ -1,0 +1,47 @@
+from fastapi import APIRouter
+from app.models.schemas import ChatRequest
+
+from app.services.rag_service import retrieve_context
+from app.services.llm_service import generate_response
+from app.services.memory_service import (
+    add_message,
+    get_history
+)
+
+from app.prompts.prompt_template import PROMPT_TEMPLATE
+
+router = APIRouter()
+
+@router.post("/api/chat")
+def chat(request: ChatRequest):
+
+    context, chunks = retrieve_context(request.message)
+
+    if not context:
+        return {
+            "reply": "I could not find enough information in the knowledge base to answer this question.",
+            "tokensUsed": 0,
+            "retrievedChunks": 0
+        }
+
+    history = get_history(request.sessionId)
+
+    prompt = PROMPT_TEMPLATE.format(
+        context=context,
+        history=history,
+        question=request.message
+    )
+
+    response = generate_response(prompt)
+
+    add_message(
+        request.sessionId,
+        request.message,
+        response["reply"]
+    )
+
+    return {
+        "reply": response["reply"],
+        "tokensUsed": response["tokens"],
+        "retrievedChunks": len(chunks)
+    }
